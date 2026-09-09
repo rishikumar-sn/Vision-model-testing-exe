@@ -1,0 +1,2 @@
+# The packaged Windows application is stored through Git LFS.
+dist/UniversalVisionModelTester.exe filter=lfs diff=lfs merge=lfs -text

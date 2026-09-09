@@ -246,6 +246,27 @@ pip install tensorflow
 
 ## Run
 
+### Ready-to-use Windows executable
+
+The repository includes a prebuilt Windows executable stored with Git LFS. To
+download it when cloning the repository, install [Git LFS](https://git-lfs.com/)
+and run:
+
+```bat
+git lfs install
+git clone https://github.com/rishikumar-sn/Vision-model-testing-exe.git
+cd Vision-model-testing-exe
+git lfs pull
+dist\UniversalVisionModelTester.exe
+```
+
+You can also download the executable from `dist/UniversalVisionModelTester.exe`
+on the repository page. The file is large because the packaged application
+contains Python and its machine-learning dependencies. Windows may show a
+SmartScreen warning because the executable is not code-signed.
+
+### Run from Python source
+
 ```bash
 python main.py
 ```

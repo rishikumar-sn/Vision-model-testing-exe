@@ -15,9 +15,12 @@ env/
 
 # Packaging and generated executables
 build/
-dist/
+# Publish only the ready-to-use executable; keep other generated output ignored.
+dist/*
+!dist/UniversalVisionModelTester.exe
 *.egg-info/
 *.exe
+!dist/UniversalVisionModelTester.exe
 *.msi
 *.app
 pyinstaller-build.log
