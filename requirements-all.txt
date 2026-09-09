@@ -1,0 +1,10 @@
+-r requirements-core.txt
+# Install the correct CUDA-enabled PyTorch build for your machine when NVIDIA acceleration is required.
+torch
+torchvision
+ultralytics
+# CPU ONNX Runtime. For NVIDIA CUDA, replace this package with onnxruntime-gpu.
+onnxruntime
+rfdetr
+transformers
+tensorflow

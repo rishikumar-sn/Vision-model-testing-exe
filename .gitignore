@@ -1,0 +1,61 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Packaging and generated executables
+build/
+dist/
+*.egg-info/
+*.exe
+*.msi
+*.app
+pyinstaller-build.log
+*.pid
+
+# Local editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Downloaded/trained model artifacts
+*.pt
+*.pth
+*.onnx
+*.keras
+*.h5
+*.tflite
+*.safetensors
+*.engine
+*.hef
+checkpoints/
+models/
+weights/
+
+# Generated model settings and inference output
+*.infer.json
+outputs/
+runs/
+captures/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Temporary files
+*.log
+*.tmp
+*.temp
+~$*
