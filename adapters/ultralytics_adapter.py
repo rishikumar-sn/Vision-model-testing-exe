@@ -71,7 +71,17 @@ class UltralyticsAdapter(BaseAdapter):
         except Exception as exc:
             raise AdapterError("Ultralytics is not installed. Run: pip install ultralytics") from exc
         try:
-            self.model = YOLO(source)
+            task = None
+            if Path(source).suffix.lower() == ".onnx":
+                try:
+                    import onnxruntime as ort
+
+                    session = ort.InferenceSession(source, providers=["CPUExecutionProvider"])
+                    task = (session.get_modelmeta().custom_metadata_map or {}).get("task")
+                    del session
+                except Exception:
+                    pass
+            self.model = YOLO(source, task=task) if task in {"detect", "segment", "classify", "pose", "obb"} else YOLO(source)
         except Exception as exc:
             raise AdapterError(f"Ultralytics could not load this model: {exc}") from exc
         self.source = source

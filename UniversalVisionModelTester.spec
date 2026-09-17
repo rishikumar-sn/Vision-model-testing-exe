@@ -7,6 +7,7 @@ One-file extraction is slow, harder to diagnose, and can cause DLL-loading failu
 
 import importlib.util
 import sys
+from pathlib import Path
 
 from PyInstaller.utils.hooks import collect_all, copy_metadata
 
@@ -16,6 +17,13 @@ sys.setrecursionlimit(max(5000, sys.getrecursionlimit() * 5))
 
 datas = [("applogo.png", "."), ("VERSION", ".")]
 binaries = []
+# optree's extension depends on a vendored C++ runtime DLL stored beside the
+# package, outside the package directory. PyInstaller misses it on Windows.
+optree_spec = importlib.util.find_spec("optree")
+if optree_spec is not None and optree_spec.origin:
+    optree_libs = Path(optree_spec.origin).resolve().parent.parent / "optree.libs"
+    if optree_libs.is_dir():
+        binaries += [(str(dll), "optree.libs") for dll in optree_libs.glob("*.dll")]
 hiddenimports = [
     "torch",
     "torchvision",
@@ -61,7 +69,7 @@ if installed("rfdetr"):
 # Several ML libraries query their wheel metadata at runtime. Missing metadata
 # is a common source-tree-works / packaged-exe-fails difference.
 for distribution in (
-    "torch", "torchvision", "ultralytics", "onnxruntime", "onnxruntime-gpu", "rfdetr",
+    "torch", "torchvision", "ultralytics", "onnx", "onnxruntime", "onnxruntime-gpu", "rfdetr",
     "tensorflow", "keras", "transformers", "timm", "supervision",
     "huggingface-hub", "safetensors",
 ):

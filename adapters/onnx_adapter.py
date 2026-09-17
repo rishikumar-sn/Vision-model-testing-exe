@@ -77,6 +77,17 @@ class ONNXAdapter(BaseAdapter):
         except Exception:
             meta = {}
         self.model_labels = _metadata_labels(meta)
+        self._ultralytics_obb = None
+        if self.task == "obb":
+            # Ultralytics exports raw rotated boxes; the generic axis-aligned
+            # parser would mistake their angle channel for a class score.
+            from adapters.ultralytics_adapter import UltralyticsAdapter
+
+            self._ultralytics_obb = UltralyticsAdapter(self.device_status)
+            info = self._ultralytics_obb.load(source, settings)
+            info.adapter = self.display_name
+            info.details["decoder"] = "Ultralytics OBB"
+            return info
         return ModelInfo(
             source, self.display_name, self.task, self.device,
             "; ".join(f"{x.name}: {_shape_text(x.shape)} {x.type}" for x in inputs),
@@ -141,6 +152,10 @@ class ONNXAdapter(BaseAdapter):
         return feeds, (target_w, target_h), (w0, h0)
 
     def infer(self, frame: np.ndarray, settings: dict[str, Any]) -> InferenceResult:
+        if getattr(self, "_ultralytics_obb", None) is not None:
+            result = self._ultralytics_obb.infer(frame, settings)
+            result.adapter = self.display_name
+            return result
         t0 = time.perf_counter()
         feeds, input_size, original_size = self._prepare(frame, settings)
         t1 = time.perf_counter()

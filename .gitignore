@@ -15,6 +15,7 @@ env/
 
 # Packaging and generated executables
 build/
+dist_builds/
 # Publish only the ready-to-use executable; keep other generated output ignored.
 dist/*
 !dist/UniversalVisionModelTester.exe

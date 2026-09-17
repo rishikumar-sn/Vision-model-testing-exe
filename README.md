@@ -374,13 +374,9 @@ From an activated environment containing every backend you want in the build:
 ```bat
 python -m pip install --upgrade -r requirements-build.txt
 python diagnostics.py
-python -m PyInstaller --clean --noconfirm UniversalVisionModelTester.spec
+python build_windows.py
 ```
 
-Run the result with:
+Run the executable at the `Build ready` path printed by the build script.
 
-```bat
-dist\UniversalVisionModelTester\UniversalVisionModelTester.exe
-```
-
-To rebuild from a completely clean PyInstaller analysis, remove only the generated `build\UniversalVisionModelTester` and `dist\UniversalVisionModelTester` directories, then run the same command again. Do not distribute just the executable; zip and distribute the entire `dist\UniversalVisionModelTester` directory.
+`build_windows.py` runs the PyInstaller spec on a thread with a larger Windows stack, which prevents stack overflow while analyzing the combined ML dependencies. Each build goes to a timestamped folder under `dist_builds` so an open executable cannot block a rebuild. The script prints the exact output path. Keep its `_internal` folder beside the executable when distributing it.
