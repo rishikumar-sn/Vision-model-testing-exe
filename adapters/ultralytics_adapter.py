@@ -16,6 +16,50 @@ class UltralyticsAdapter(BaseAdapter):
     display_name = "Ultralytics YOLO"
 
     @staticmethod
+    def _normalize_imgsz(value: Any):
+        """Return an Ultralytics-compatible image size from checkpoint metadata."""
+        if isinstance(value, (list, tuple)):
+            try:
+                dimensions = [int(item) for item in value]
+            except (TypeError, ValueError):
+                return None
+            if len(dimensions) == 1 and dimensions[0] > 0:
+                return dimensions[0]
+            if len(dimensions) == 2 and all(item > 0 for item in dimensions):
+                return dimensions[0] if dimensions[0] == dimensions[1] else dimensions
+            return None
+        try:
+            size = int(value)
+        except (TypeError, ValueError):
+            return None
+        return size if size > 0 else None
+
+    @classmethod
+    def _checkpoint_imgsz(cls, model):
+        """Read the training image size embedded by different Ultralytics releases."""
+        candidates = []
+        overrides = getattr(model, "overrides", None)
+        if isinstance(overrides, dict):
+            candidates.append(overrides.get("imgsz"))
+
+        inner_model = getattr(model, "model", None)
+        model_args = getattr(inner_model, "args", None)
+        if isinstance(model_args, dict):
+            candidates.append(model_args.get("imgsz"))
+
+        checkpoint = getattr(model, "ckpt", None)
+        if isinstance(checkpoint, dict):
+            train_args = checkpoint.get("train_args")
+            if isinstance(train_args, dict):
+                candidates.append(train_args.get("imgsz"))
+
+        for candidate in candidates:
+            size = cls._normalize_imgsz(candidate)
+            if size is not None:
+                return size
+        return None
+
+    @staticmethod
     def _onnx_input_size(source: str) -> tuple[int, int] | None:
         """Return a fixed ONNX image input as (height, width), if declared."""
         if Path(source).suffix.lower() != ".onnx":
@@ -92,11 +136,17 @@ class UltralyticsAdapter(BaseAdapter):
             raise AdapterError("Ultralytics loaded the file but could not identify a supported task; trying another adapter is safer.")
         names = getattr(self.model, "names", None)
         requested_imgsz = int(settings.get("imgsz", 640))
-        effective_imgsz = self._predict_imgsz(self.fixed_input_size, requested_imgsz)
+        checkpoint_imgsz = self._checkpoint_imgsz(self.model)
+        effective_imgsz = self._predict_imgsz(
+            self.fixed_input_size,
+            checkpoint_imgsz if checkpoint_imgsz is not None else requested_imgsz,
+        )
         input_description = f"imgsz={effective_imgsz}"
         if self.fixed_input_size:
             height, width = self.fixed_input_size
             input_description = f"imgsz={width} x {height} (fixed ONNX input)"
+        elif checkpoint_imgsz is not None:
+            input_description = f"imgsz={effective_imgsz} (from model metadata)"
         return ModelInfo(
             source=source,
             adapter=self.display_name,
@@ -107,6 +157,7 @@ class UltralyticsAdapter(BaseAdapter):
             details={
                 "names": names or {},
                 "fixed_input_size": self.fixed_input_size,
+                "checkpoint_imgsz": checkpoint_imgsz,
                 "effective_imgsz": effective_imgsz,
             },
         )

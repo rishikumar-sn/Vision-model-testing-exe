@@ -284,6 +284,11 @@ run_windows.bat
 3. Select/enter a model.
 4. Keep `Adapter = Auto`, or select the adapter explicitly for ambiguous checkpoints.
 5. Select `Device = Auto`.
+
+For Ultralytics models, the app automatically reads the training image size
+stored in the checkpoint and updates the Image size control when the model is
+loaded. Models without embedded size metadata continue to use the selected
+value (640 by default); fixed-shape ONNX models use their declared input shape.
 6. Press **Load Model**.
 7. Open a camera, image, video, or folder.
 8. Optionally draw an ROI.

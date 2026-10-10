@@ -530,11 +530,16 @@ class MainWindow(QMainWindow):
     def on_model_loaded(self, info: ModelInfo):
         self.model_is_loaded = True
         self.load_model_button.setEnabled(True)
-        fixed_input_size = info.details.get("fixed_input_size")
-        if fixed_input_size and len(fixed_input_size) == 2:
-            height, width = map(int, fixed_input_size)
-            if height == width and self.imgsz_spin.value() != height:
-                self.imgsz_spin.setValue(height)
+        effective_imgsz = info.details.get("effective_imgsz")
+        if isinstance(effective_imgsz, (list, tuple)):
+            if len(effective_imgsz) == 2 and int(effective_imgsz[0]) == int(effective_imgsz[1]):
+                effective_imgsz = int(effective_imgsz[0])
+            else:
+                effective_imgsz = None
+        if effective_imgsz is not None:
+            effective_imgsz = int(effective_imgsz)
+            if self.imgsz_spin.value() != effective_imgsz:
+                self.imgsz_spin.setValue(effective_imgsz)
         self.model_info_label.setText(
             f"Adapter: {info.adapter}\nTask: {info.task}\nDevice: {info.device}\n"
             f"Input: {info.input_description}\nOutput: {info.output_description}")
