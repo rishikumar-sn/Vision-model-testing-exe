@@ -6,7 +6,7 @@ import multiprocessing
 import sys
 from pathlib import Path
 
-# Keep OpenCV/Qt plugin conflicts predictable on Linux.
+# Use automatic display scaling where supported.
 os.environ.setdefault("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
 
 def main() -> int:
@@ -20,9 +20,22 @@ def main() -> int:
 
         return run(sys.argv[2], sys.argv[3], sys.argv[4])
 
+    # Linux OpenCV wheels can replace these with their bundled Qt 5 paths.
+    # Preserve the user's Qt configuration before importing modules using cv2.
+    qt_environment = {
+        key: os.environ.get(key)
+        for key in ("QT_QPA_PLATFORM_PLUGIN_PATH", "QT_QPA_FONTDIR")
+    }
     from PyQt6.QtGui import QIcon
     from PyQt6.QtWidgets import QApplication
     from ui.main_window import MainWindow
+
+    if sys.platform.startswith("linux"):
+        for key, value in qt_environment.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
 
     app = QApplication(sys.argv)
     app.setApplicationName("Universal Vision Model Tester")

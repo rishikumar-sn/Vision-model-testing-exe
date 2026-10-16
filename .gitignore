@@ -26,6 +26,7 @@ dist/*
 *.app
 pyinstaller-build.log
 *.pid
+dist_builds/
 
 # Local editor and OS files
 .vscode/

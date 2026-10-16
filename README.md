@@ -175,6 +175,9 @@ universal_vision_model_tester/
 
 ## Installation
 
+For Linux desktop setup, system libraries, optional model backends, camera access,
+and troubleshooting, see [the Linux installation guide](INSTALL_LINUX.md).
+
 Python 3.10 or 3.11 is the safest general-purpose environment if you want to combine PyTorch, TensorFlow, Ultralytics, Transformers, RF-DETR and ONNX Runtime in one environment. Some individual packages may support newer Python versions, but the intersection of all optional stacks can lag.
 
 ### Recommended: virtual environment

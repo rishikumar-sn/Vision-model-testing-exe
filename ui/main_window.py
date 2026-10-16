@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -300,6 +301,8 @@ class MainWindow(QMainWindow):
         recalibrate = QPushButton("Recalibrate")
         recalibrate.clicked.connect(self.recalibrate_anti_flicker)
         driver = QPushButton("Driver Settings")
+        driver.setEnabled(sys.platform == "win32")
+        driver.setToolTip("Camera driver settings dialog is available on Windows only.")
         driver.clicked.connect(self.open_driver_settings)
         self.flicker_status_label = QLabel("Anti-flicker: —")
         self.flicker_status_label.setWordWrap(True)
