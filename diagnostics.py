@@ -58,6 +58,12 @@ if len(ort_distributions) > 1:
     print("     [WARN] Both onnxruntime and onnxruntime-gpu are installed; keep only one.")
 
 check("Ultralytics", "ultralytics")
+openvino = check("OpenVINO", "openvino")
+if openvino is not None:
+    try:
+        print("     Devices:", openvino.Core().available_devices)
+    except Exception as exc:
+        print("     OpenVINO device check failed:", exc)
 check("RF-DETR", "rfdetr")
 check("Transformers", "transformers")
 check("TensorFlow", "tensorflow")

@@ -2,7 +2,8 @@
 # Install the correct CUDA-enabled PyTorch build for your machine when NVIDIA acceleration is required.
 torch
 torchvision
-ultralytics
+ultralytics>=8.4.90
+openvino>=2026.4.1
 # CPU ONNX Runtime. For NVIDIA CUDA, replace this package with onnxruntime-gpu.
 onnxruntime
 rfdetr

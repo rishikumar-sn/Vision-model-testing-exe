@@ -484,7 +484,7 @@ class MainWindow(QMainWindow):
     def choose_model_file(self):
         path, _ = QFileDialog.getOpenFileName(
             self, "Choose Model", "",
-            "Model files (*.pt *.pth *.onnx *.keras *.h5 *.tflite *.torchscript *.jit);;All files (*.*)")
+            "Model files (*.pt *.pth *.onnx *.xml *.keras *.h5 *.tflite *.torchscript *.jit);;OpenVINO IR (*.xml);;All files (*.*)")
         if path:
             self.model_path_edit.setText(path)
             self.on_model_source_changed()

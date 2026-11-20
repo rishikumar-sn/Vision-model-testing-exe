@@ -30,6 +30,7 @@ hiddenimports = [
     "torchvision.ops",
     "ultralytics",
     "onnxruntime",
+    "openvino",
     "rfdetr",
     "tensorflow",
     "keras",
@@ -66,12 +67,20 @@ if installed("rfdetr"):
     binaries += package_binaries
     hiddenimports += package_hidden
 
+# OpenVINO discovers its IR frontend and device plugins dynamically. Include
+# its native DLLs and package resources even when static analysis misses them.
+if installed("openvino"):
+    package_datas, package_binaries, package_hidden = collect_all("openvino")
+    datas += package_datas
+    binaries += package_binaries
+    hiddenimports += package_hidden
+
 # Several ML libraries query their wheel metadata at runtime. Missing metadata
 # is a common source-tree-works / packaged-exe-fails difference.
 for distribution in (
     "torch", "torchvision", "ultralytics", "onnx", "onnxruntime", "onnxruntime-gpu", "rfdetr",
     "tensorflow", "keras", "transformers", "timm", "supervision",
-    "huggingface-hub", "safetensors",
+    "huggingface-hub", "safetensors", "openvino", "openvino-telemetry",
 ):
     try:
         datas += copy_metadata(distribution)
@@ -98,7 +107,6 @@ a = Analysis(
         "distributed",
         "pytorch_lightning",
         "tensorboard",
-        "openvino",
     ],
     noarchive=False,
     optimize=0,

@@ -113,6 +113,27 @@ The model source box can contain either:
 
 Enter one text prompt per line. The app computes normalized image/text features, cosine similarities, and a convenient relative softmax ranking.
 
+### OpenVINO INT8 / FP16 / FP32
+
+Choose **Auto** or **OpenVINO (INT8 / FP16 / FP32)**, then select an
+Ultralytics `*_openvino_model` export directory or its `.xml` file. Keep the
+matching `.bin` and `metadata.yaml` in that directory, with exactly one model.
+This adapter runs on **OpenVINO CPU**, including when the global device setting
+is Auto or CUDA. It reads the fixed input dimensions from the model, applies
+Ultralytics preprocessing and result decoding, and supports detection,
+segmentation, classification, pose, and OBB exports with static batch-one RGB
+inputs. Dynamic inputs and arbitrary non-Ultralytics IR models are not supported.
+
+The `beadfinder_int8_openvino_model` export uses **960 x 960** input; loading it
+updates the image size automatically. INT8 quantization stays in the exported
+graph; no calibration dataset or NNCF installation is needed for testing.
+
+Install the runtime in the same Python environment used to build the executable:
+
+```bat
+python -m pip install "openvino>=2026.4.1" "ultralytics>=8.4.90"
+```
+
 ## Important definition of "universal"
 
 No application can safely infer the architecture and postprocessing rules for every arbitrary `.pt`, `.pth`, or `.onnx` file.
@@ -381,6 +402,7 @@ From an activated environment containing every backend you want in the build:
 
 ```bat
 python -m pip install --upgrade -r requirements-build.txt
+python -m pip install "openvino>=2026.4.1" "ultralytics>=8.4.90"
 python diagnostics.py
 python build_windows.py
 ```

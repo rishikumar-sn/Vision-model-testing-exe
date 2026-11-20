@@ -5,6 +5,7 @@ from pathlib import Path
 from adapters.fastsam_adapter import FastSAMAdapter
 from adapters.keras_adapter import KerasAdapter
 from adapters.onnx_adapter import ONNXAdapter
+from adapters.openvino_adapter import OpenVINOAdapter
 from adapters.rfdetr_adapter import RFDETRAdapter
 from adapters.siglip_adapter import SigLIPAdapter
 from adapters.torch_classifier_adapter import TorchClassifierAdapter
@@ -15,6 +16,7 @@ ADAPTER_NAMES = [
     "Auto",
     UltralyticsAdapter.display_name,
     ONNXAdapter.display_name,
+    OpenVINOAdapter.display_name,
     RFDETRAdapter.display_name,
     TorchClassifierAdapter.display_name,
     KerasAdapter.display_name,
@@ -27,6 +29,7 @@ def adapter_classes_for(source: str, requested: str):
     mapping = {
         UltralyticsAdapter.display_name: [UltralyticsAdapter],
         ONNXAdapter.display_name: [ONNXAdapter],
+        OpenVINOAdapter.display_name: [OpenVINOAdapter],
         RFDETRAdapter.display_name: [RFDETRAdapter],
         TorchClassifierAdapter.display_name: [TorchClassifierAdapter],
         KerasAdapter.display_name: [KerasAdapter],
@@ -39,6 +42,8 @@ def adapter_classes_for(source: str, requested: str):
     lower = source.lower()
     suffix = Path(source).suffix.lower()
     name = Path(source).name.lower()
+    if suffix == ".xml" or (Path(source).is_dir() and any(Path(source).glob("*.xml"))):
+        return [OpenVINOAdapter]
     if "fastsam" in name:
         return [FastSAMAdapter, UltralyticsAdapter, TorchClassifierAdapter]
     if suffix == ".onnx":
